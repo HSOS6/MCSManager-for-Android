@@ -1,11 +1,17 @@
 #!/bin/bash
+
+# 颜色定义
+GREEN='\033[32m'
+GRAY='\033[90m'
+RESET='\033[0m'
+
 clear
 ip_address=$(ifconfig 2>/dev/null | grep 'inet ' | grep -Fv 127.0.0.1 | awk '{print $2}' | head -1)
 echo "
-By: wjsw3369
+By: 星见雅（HSOS6）
 
  欢迎使用 MCSManager-for-Android 小白辅助脚本
- "
+"
 echo "本机IP地址： $ip_address"
 echo '
 bash <(curl -sSL https://raw.githubusercontent.com/HSOS6/MCSManager-for-Android/main/mian.sh)
@@ -31,6 +37,32 @@ fix_termux_node() {
 
 # 获取脚本所在目录（兼容本地运行和远程curl运行）
 SCRIPT_DIR="$(cd "$(dirname "$0")" 2>/dev/null && pwd)"
+
+# 检查 MCSM 运行状态
+check_mcsm_status() {
+    local web_status="未运行"
+    local daemon_status="未运行"
+    local web_color="$GRAY"
+    local daemon_color="$GRAY"
+
+    # 检查 Web 进程 (端口 23333)
+    if pgrep -f "node.*app.js" > /dev/null 2>&1; then
+        # 检查端口 23333 是否在监听
+        if netstat -tlnp 2>/dev/null | grep -q ":23333" || ss -tlnp 2>/dev/null | grep -q ":23333"; then
+            web_status="运行中"
+            web_color="$GREEN"
+        fi
+        # 检查端口 24444 是否在监听
+        if netstat -tlnp 2>/dev/null | grep -q ":24444" || ss -tlnp 2>/dev/null | grep -q ":24444"; then
+            daemon_status="运行中"
+            daemon_color="$GREEN"
+        fi
+    fi
+
+    echo "MCSM运行状态"
+    echo -e "网页端 ${web_color}${web_status}${RESET}   守护端 ${daemon_color}${daemon_status}${RESET}"
+    echo "您的IP：$ip_address"
+}
 
 # 一键安装MCSManager-for-Android
 MCSManager_Android() {
@@ -225,18 +257,20 @@ else
     echo "本脚本大部分操作基于 ZeroTermux"
     while true; do
         echo ""
-        echo "请选择以下功能："
-        echo "1. 安装MCSManager-for-Android"
-        echo "2. 安装java-21环境"
-        echo "3. 启动守护进程"
-        echo "4. 启动Web进程"
-        echo "5. 修复Termux-Node.js环境(解决OSSL报错)"
-        echo "6. 卸载MCSManager"
-        echo "7. 一键后台启动(守护进程+Web面板)"
-        echo "8. 查看运行日志(Ctrl+C退出)"
-        echo "q. 退出"
+        check_mcsm_status
         echo ""
-        read -p "请输入功能序号: " input
+        echo "请选择以下功能："
+        echo "1. ✨安装MCSManager"
+        echo "2. ✨安装java-21环境"
+        echo "3. ✨启动 MCSM 守护进程"
+        echo "4. ✨启动 MCSM 网页进程"
+        echo "5. ✨修复Termux-Node.js环境(解决OSSL报错)"
+        echo "6. ✨卸载MCSManager"
+        echo "7. ✨一键后台启动(守护进程+Web面板)"
+        echo "8. ✨查看运行日志(Ctrl+C退出)"
+        echo "q. ✨退出"
+        echo ""
+        read -p "请输入序号: " input
         case $input in
         1) MCSManager_Android ;;
         2) java_install ;;
