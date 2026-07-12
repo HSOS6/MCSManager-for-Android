@@ -46,7 +46,7 @@ echo "  正在下载中，请稍候..."
 if ! wget -O mcsmanager.tar.gz "$MCSM_URL" --timeout=30; then
     echo "> GitHub 下载失败，尝试使用镜像..."
     # 尝试使用特定版本号
-    wget -O mcsmanager.tar.gz "https://github.com/MCSManager/MCSManager/releases/download/v10.12.4/mcsmanager_linux_release.tar.gz" --timeout=30 || {
+    wget -O mcsmanager.tar.gz "https://github.com/MCSManager/MCSManager/releases/download/v10.16.2/mcsmanager_linux_release.tar.gz" --timeout=30 || {
         echo "> 下载失败！请检查网络连接。"
         echo "> 手动下载地址: https://github.com/MCSManager/MCSManager/releases"
         exit 1
