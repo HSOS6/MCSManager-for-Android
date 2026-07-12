@@ -28,9 +28,29 @@ echo "npm 版本: $(npm -v)"
 # 设置 OpenSSL 兼容模式（防止 legacy provider 错误）
 export NODE_OPTIONS=--openssl-legacy-provider
 
-# 第三步：下载最新 MCSManager 官方 Release
+# 第三步：安装下载工具，下载最新 MCSManager 官方 Release
 echo ""
 echo "> [3/4] 下载最新版 MCSManager..."
+
+# 确保下载工具可用
+if ! command -v wget &> /dev/null && ! command -v curl &> /dev/null; then
+    echo "  安装 wget..."
+    pkg install wget -y 2>/dev/null || true
+fi
+
+# 封装下载函数
+download_file() {
+    local url="$1"
+    local output="$2"
+    if command -v wget &> /dev/null; then
+        wget -O "$output" "$url" --timeout=30
+    elif command -v curl &> /dev/null; then
+        curl -L -o "$output" "$url" --connect-timeout 30
+    else
+        return 1
+    fi
+}
+
 cd ~
 rm -rf ~/mcsm
 mkdir -p ~/mcsm
@@ -38,15 +58,15 @@ cd ~/mcsm
 
 # 从 GitHub 官方 Release 下载最新版本
 MCSM_URL="https://github.com/MCSManager/MCSManager/releases/latest/download/mcsmanager_linux_release.tar.gz"
+MCSM_FALLBACK_URL="https://github.com/MCSManager/MCSManager/releases/download/v10.16.2/mcsmanager_linux_release.tar.gz"
 
 echo "  下载地址: $MCSM_URL"
 echo "  正在下载中，请稍候..."
 
 # 尝试下载，如果失败则使用备用镜像
-if ! wget -O mcsmanager.tar.gz "$MCSM_URL" --timeout=30; then
+if ! download_file "$MCSM_URL" mcsmanager.tar.gz; then
     echo "> GitHub 下载失败，尝试使用镜像..."
-    # 尝试使用特定版本号
-    wget -O mcsmanager.tar.gz "https://github.com/MCSManager/MCSManager/releases/download/v10.16.2/mcsmanager_linux_release.tar.gz" --timeout=30 || {
+    download_file "$MCSM_FALLBACK_URL" mcsmanager.tar.gz || {
         echo "> 下载失败！请检查网络连接。"
         echo "> 手动下载地址: https://github.com/MCSManager/MCSManager/releases"
         exit 1
