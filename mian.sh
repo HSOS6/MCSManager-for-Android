@@ -114,6 +114,7 @@ fix_termux_binaries() {
 # 启动守护进程
 start_Daemon() {
     echo "> 启动守护进程"
+    mkdir -p /tmp/mcsmanager-instance-pipe
     export NODE_OPTIONS=--openssl-legacy-provider
     MCSM_DIR=$(find_mcsm_dir)
     if [ -z "$MCSM_DIR" ]; then
@@ -171,6 +172,7 @@ start_all_background() {
         return
     fi
 
+    mkdir -p /tmp/mcsmanager-instance-pipe
     export NODE_OPTIONS=--openssl-legacy-provider
     LOG_DIR="$MCSM_DIR/logs"
     mkdir -p "$LOG_DIR"

@@ -96,6 +96,10 @@ if [ ! -d "daemon" ] && [ ! -d "web" ]; then
     ls -la
 fi
 
+# Termux 兼容：创建守护进程所需的 /tmp/mcsmanager-instance-pipe 目录
+mkdir -p /tmp/mcsmanager-instance-pipe
+echo "  创建守护进程管道目录: /tmp/mcsmanager-instance-pipe"
+
 # Termux 兼容：Node.js 在 Termux 中返回 android 平台，需创建 linux->android 软链接
 if [ -d "daemon/lib" ]; then
     cd ~/mcsm/daemon/lib
