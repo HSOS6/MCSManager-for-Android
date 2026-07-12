@@ -96,6 +96,12 @@ if [ ! -d "daemon" ] && [ ! -d "web" ]; then
     ls -la
 fi
 
+# Termux 兼容：修补 daemon/app.js 中的管道目录路径（/tmp 在 Termux 中为只读）
+if [ -f "daemon/app.js" ]; then
+    sed -i 's|"/tmp/mcsmanager-instance-pipe"|os_1.default.tmpdir() + "/mcsmanager-instance-pipe"|g' daemon/app.js
+    echo "  已修补守护进程管道目录路径"
+fi
+
 # Termux 兼容：Node.js 在 Termux 中返回 android 平台，需创建 linux->android 软链接
 if [ -d "daemon/lib" ]; then
     cd ~/mcsm/daemon/lib

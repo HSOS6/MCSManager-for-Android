@@ -2262,7 +2262,7 @@ class PtyStartCommand extends command_1.default {
         if (commandList.length === 0)
             return instance.failure(new StartupError((0, i18n_1.$t)("TXT_CODE_pty_start.cmdEmpty")));
         const pipeId = (0, uuid_1.v4)();
-        const pipeLinuxDir = "/tmp/mcsmanager-instance-pipe";
+        const pipeLinuxDir = os_1.default.tmpdir() + "/mcsmanager-instance-pipe";
         if (!fs_extra_1.default.existsSync(pipeLinuxDir))
             fs_extra_1.default.mkdirsSync(pipeLinuxDir);
         let pipeName = `${pipeLinuxDir}/pipe-${pipeId}`;
