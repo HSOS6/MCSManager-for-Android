@@ -189,6 +189,7 @@ start_all_background() {
     fi
     cd "$DAEMON_DIR"
     nohup node app.js > "$LOG_DIR/daemon.log" 2>&1 &
+    echo $! > "$LOG_DIR/daemon.pid"
     echo "  守护进程 PID: $!"
 
     echo "> 后台启动Web面板..."
@@ -198,6 +199,7 @@ start_all_background() {
     fi
     cd "$WEB_DIR"
     nohup node app.js > "$LOG_DIR/web.log" 2>&1 &
+    echo $! > "$LOG_DIR/web.pid"
     echo "  Web面板 PID: $!"
 
     echo ""
