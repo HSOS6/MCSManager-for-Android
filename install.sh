@@ -96,6 +96,21 @@ if [ ! -d "daemon" ] && [ ! -d "web" ]; then
     ls -la
 fi
 
+# Termux 兼容：Node.js 在 Termux 中返回 android 平台，需创建 linux->android 软链接
+if [ -d "daemon/lib" ]; then
+    cd ~/mcsm/daemon/lib
+    for f in pty_linux_arm64 file_zip_linux_arm64; do
+        if [ -f "$f" ]; then
+            ANDROID_NAME="${f//linux_/android_}"
+            if [ ! -f "$ANDROID_NAME" ]; then
+                echo "  创建 Termux 兼容链接: $f -> $ANDROID_NAME"
+                ln -sf "$f" "$ANDROID_NAME"
+            fi
+        fi
+    done
+    cd ~/mcsm
+fi
+
 # 第四步：安装依赖
 echo ""
 echo "> [4/4] 安装项目依赖..."

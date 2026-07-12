@@ -62,10 +62,33 @@ find_mcsm_dir() {
     fi
 }
 
+# Termux 兼容：创建 linux_arm64 -> android_arm64 软链接
+fix_termux_binaries() {
+    local MCSM_DIR="$1"
+    if [ -d "$MCSM_DIR/daemon/lib" ]; then
+        cd "$MCSM_DIR/daemon/lib"
+        for f in pty_linux_arm64 file_zip_linux_arm64; do
+            if [ -f "$f" ]; then
+                local ANDROID_NAME="${f//linux_/android_}"
+                if [ ! -f "$ANDROID_NAME" ]; then
+                    ln -sf "$f" "$ANDROID_NAME"
+                fi
+            fi
+        done
+        cd "$MCSM_DIR"
+    fi
+}
+
 # 启动守护进程
 start_Daemon() {
     echo "> 启动守护进程"
     export NODE_OPTIONS=--openssl-legacy-provider
+    MCSM_DIR=$(find_mcsm_dir)
+    if [ -z "$MCSM_DIR" ]; then
+        echo "错误: 找不到 MCSManager 目录，请先执行选项1安装"
+        return
+    fi
+    fix_termux_binaries "$MCSM_DIR"
     if [ -d ~/mcsm/daemon ]; then
         cd ~/mcsm/daemon
     elif [ -d ~/mcsm/panel ]; then
@@ -81,6 +104,12 @@ start_Daemon() {
 start_web() {
     echo "> 启动Web进程"
     export NODE_OPTIONS=--openssl-legacy-provider
+    MCSM_DIR=$(find_mcsm_dir)
+    if [ -z "$MCSM_DIR" ]; then
+        echo "错误: 找不到 MCSManager 目录，请先执行选项1安装"
+        return
+    fi
+    fix_termux_binaries "$MCSM_DIR"
     if [ -d ~/mcsm/web ]; then
         cd ~/mcsm/web
     elif [ -d ~/mcsm/panel ]; then
@@ -113,6 +142,9 @@ start_all_background() {
     export NODE_OPTIONS=--openssl-legacy-provider
     LOG_DIR="$MCSM_DIR/logs"
     mkdir -p "$LOG_DIR"
+
+    # Termux 兼容链接
+    fix_termux_binaries "$MCSM_DIR"
 
     # 停止旧进程
     pkill -f "node.*app.js" 2>/dev/null
