@@ -22,7 +22,7 @@ sed -i 's@^\(deb.*stable main\)$@#\1\ndeb https://mirrors.tuna.tsinghua.edu.cn/t
 一. 拉取 mian.sh 运行 MCSManager-for-Android 小白辅助脚本
 
 ```shell
-bash <(curl -sSL https://raw.githubusercontent.com/wjsw3369/MCSManager-for-Android/main/mian.sh)
+bash <(curl -sSL https://raw.githubusercontent.com/HSOS6/MCSManager-for-Android/main/mian.sh)
 ```
 
 ```shell
@@ -32,7 +32,7 @@ By: wjsw3369
  
 本机IP地址：(你的IP地址，用于局域网连接等使用)
 
-bash <(curl -sSL https://raw.githubusercontent.com/wjsw3369/MCSManager-for-Android/main/mian.sh)
+bash <(curl -sSL https://raw.githubusercontent.com/HSOS6/MCSManager-for-Android/main/mian.sh)
 
 
 
@@ -89,4 +89,4 @@ export NODE_OPTIONS=--openssl-legacy-provider
 
   gitee：---
     
-  cloudflare代理：[proxy分支](https://github.com/wjsw3369/MCSManager-for-Android/tree/proxy)
+  cloudflare代理：[proxy分支](https://github.com/HSOS6/MCSManager-for-Android/tree/proxy)

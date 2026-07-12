@@ -8,7 +8,7 @@ By: wjsw3369
  "
 echo "本机IP地址： $ip_address"
 echo '
-bash <(curl -sSL https://raw.githubusercontent.com/wjsw3369/MCSManager-for-Android/main/mian.sh)
+bash <(curl -sSL https://raw.githubusercontent.com/HSOS6/MCSManager-for-Android/main/mian.sh)
 
 '
 
@@ -38,7 +38,7 @@ MCSManager_Android() {
     if [ -f "$SCRIPT_DIR/install.sh" ]; then
         bash "$SCRIPT_DIR/install.sh"
     else
-        bash <(curl -sSL https://raw.githubusercontent.com/wjsw3369/MCSManager-for-Android/main/install.sh)
+        bash <(curl -sSL https://raw.githubusercontent.com/HSOS6/MCSManager-for-Android/main/install.sh)
     fi
 }
 
@@ -47,7 +47,7 @@ java_install() {
     if [ -f "$SCRIPT_DIR/java21install.sh" ]; then
         bash "$SCRIPT_DIR/java21install.sh"
     else
-        bash <(curl -sSL https://raw.githubusercontent.com/wjsw3369/MCSManager-for-Android/main/java21install.sh)
+        bash <(curl -sSL https://raw.githubusercontent.com/HSOS6/MCSManager-for-Android/main/java21install.sh)
     fi
 }
 
