@@ -29,15 +29,26 @@ fix_termux_node() {
     echo "  export NODE_OPTIONS=--openssl-legacy-provider"
 }
 
+# 获取脚本所在目录（兼容本地运行和远程curl运行）
+SCRIPT_DIR="$(cd "$(dirname "$0")" 2>/dev/null && pwd)"
+
 # 一键安装MCSManager-for-Android
 MCSManager_Android() {
     echo "> 安装 MCSManager-for-Android"
-    bash <(curl -sSL https://raw.githubusercontent.com/wjsw3369/MCSManager-for-Android/main/install.sh)
+    if [ -f "$SCRIPT_DIR/install.sh" ]; then
+        bash "$SCRIPT_DIR/install.sh"
+    else
+        bash <(curl -sSL https://raw.githubusercontent.com/wjsw3369/MCSManager-for-Android/main/install.sh)
+    fi
 }
 
 # 安装java21环境
 java_install() {
-    bash <(curl -sSL https://raw.githubusercontent.com/wjsw3369/MCSManager-for-Android/main/java21install.sh)
+    if [ -f "$SCRIPT_DIR/java21install.sh" ]; then
+        bash "$SCRIPT_DIR/java21install.sh"
+    else
+        bash <(curl -sSL https://raw.githubusercontent.com/wjsw3369/MCSManager-for-Android/main/java21install.sh)
+    fi
 }
 
 # 启动守护进程
