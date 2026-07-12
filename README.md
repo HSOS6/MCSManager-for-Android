@@ -85,8 +85,3 @@ export NODE_OPTIONS=--openssl-legacy-provider
 
 ===========================================================================
 
-国内加速脚本：
-
-  gitee：---
-    
-  cloudflare代理：[proxy分支](https://github.com/HSOS6/MCSManager-for-Android/tree/proxy)
