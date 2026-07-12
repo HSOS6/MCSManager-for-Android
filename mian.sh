@@ -81,6 +81,16 @@ start_web() {
     node app.js
 }
 
+# 卸载MCSManager
+uninstall_MCSManager() {
+    echo "> 卸载 MCSManager"
+    if [ -f "$SCRIPT_DIR/uninstall.sh" ]; then
+        bash "$SCRIPT_DIR/uninstall.sh"
+    else
+        bash <(curl -sSL https://raw.githubusercontent.com/HSOS6/MCSManager-for-Android/main/uninstall.sh)
+    fi
+}
+
 # 脚本入口
 if [ $# -gt 0 ]; then
     # 如果有命令行参数，则直接执行对应的函数
@@ -100,6 +110,7 @@ else
         echo "3. 启动守护进程"
         echo "4. 启动Web进程"
         echo "5. 修复Termux-Node.js环境(解决OSSL报错)"
+        echo "6. 卸载MCSManager"
         echo "q. 退出"
         echo ""
         read -p "请输入功能序号: " input
@@ -109,6 +120,7 @@ else
         3) start_Daemon ;;
         4) start_web ;;
         5) fix_termux_node ;;
+        6) uninstall_MCSManager ;;
         'q') break ;;
         *) ;;
         esac
