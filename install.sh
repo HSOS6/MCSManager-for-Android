@@ -77,6 +77,25 @@ echo "  解压中..."
 tar -xzf mcsmanager.tar.gz
 rm -f mcsmanager.tar.gz
 
+# 自适应目录结构：如果 daemon/web 不在当前目录，从子目录中移出
+if [ ! -d "daemon" ] && [ ! -d "web" ]; then
+    # 查找包含 daemon 或 web 的子目录
+    SUBDIR=$(find . -maxdepth 2 -type d -name "daemon" 2>/dev/null | head -1)
+    if [ -n "$SUBDIR" ]; then
+        PARENT_DIR=$(dirname "$SUBDIR")
+        echo "  检测到压缩包包含父目录: $PARENT_DIR"
+        mv "$PARENT_DIR"/* . 2>/dev/null
+        mv "$PARENT_DIR"/.[!.]* . 2>/dev/null
+        rmdir "$PARENT_DIR" 2>/dev/null
+    fi
+fi
+
+# 验证目录结构
+if [ ! -d "daemon" ] && [ ! -d "web" ]; then
+    echo "  警告: 未找到 daemon/web 目录，当前目录内容:"
+    ls -la
+fi
+
 # 第四步：安装依赖
 echo ""
 echo "> [4/4] 安装项目依赖..."
