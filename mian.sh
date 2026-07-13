@@ -6,13 +6,26 @@ GRAY='\033[90m'
 RESET='\033[0m'
 
 clear
-ip_address=$(ifconfig 2>/dev/null | grep 'inet ' | grep -Fv 127.0.0.1 | awk '{print $2}' | head -1)
+# 获取所有网卡IP
+get_all_ips() {
+    ifconfig 2>/dev/null | grep 'inet ' | grep -Fv 127.0.0.1 | awk '{print $2}' | paste -sd ' '
+}
+# 获取公网IP
+get_public_ip() {
+    curl -s --connect-timeout 3 ip.sb 2>/dev/null || \
+    curl -s --connect-timeout 3 ifconfig.me 2>/dev/null || \
+    curl -s --connect-timeout 3 icanhazip.com 2>/dev/null || \
+    echo "获取失败"
+}
+local_ips=$(get_all_ips)
+public_ip=$(get_public_ip)
 echo "
 By: 星见雅（HSOS6）
 
  欢迎使用 MCSManager-for-Android 小白辅助脚本
 "
-echo "本机IP地址： $ip_address"
+echo "本机IP：$local_ips"
+echo "公网IP：$public_ip"
 echo '
 bash <(curl -sSL https://raw.githubusercontent.com/HSOS6/MCSManager-for-Android/main/mian.sh)
 
@@ -44,24 +57,34 @@ check_mcsm_status() {
     local daemon_status="未运行"
     local web_color="$GRAY"
     local daemon_color="$GRAY"
-
-    # 检查 Web 进程 (端口 23333)
-    if pgrep -f "node.*app.js" > /dev/null 2>&1; then
-        # 检查端口 23333 是否在监听
-        if netstat -tlnp 2>/dev/null | grep -q ":23333" || ss -tlnp 2>/dev/null | grep -q ":23333"; then
+    local MCSM_DIR=$(find_mcsm_dir)
+    local PID_DIR="${MCSM_DIR:-$HOME/mcsm}/logs"
+    if [ -f "$PID_DIR/daemon.pid" ]; then
+        local dp=$(cat "$PID_DIR/daemon.pid" 2>/dev/null)
+        if [ -n "$dp" ] && kill -0 "$dp" 2>/dev/null; then
+            daemon_status="运行中"
+            daemon_color="$GREEN"
+        fi
+    fi
+    if [ -f "$PID_DIR/web.pid" ]; then
+        local wp=$(cat "$PID_DIR/web.pid" 2>/dev/null)
+        if [ -n "$wp" ] && kill -0 "$wp" 2>/dev/null; then
             web_status="运行中"
             web_color="$GREEN"
         fi
-        # 检查端口 24444 是否在监听
-        if netstat -tlnp 2>/dev/null | grep -q ":24444" || ss -tlnp 2>/dev/null | grep -q ":24444"; then
-            daemon_status="运行中"
-            daemon_color="$GREEN"
+    fi
+    if [ "$daemon_status" = "未运行" ] || [ "$web_status" = "未运行" ]; then
+        local node_count=$(pgrep -f "node.*app.js" 2>/dev/null | wc -l)
+        if [ "$node_count" -ge 2 ]; then
+            daemon_status="运行中"; daemon_color="$GREEN"
+            web_status="运行中"; web_color="$GREEN"
         fi
     fi
 
     echo "MCSM运行状态"
     echo -e "网页端 ${web_color}${web_status}${RESET}   守护端 ${daemon_color}${daemon_status}${RESET}"
-    echo "您的IP：$ip_address"
+    echo "本机IP：$local_ips"
+    echo "公网IP：$public_ip"
 }
 
 # 一键安装MCSManager-for-Android
@@ -114,6 +137,7 @@ fix_termux_binaries() {
 # 启动守护进程
 start_Daemon() {
     echo "> 启动守护进程"
+    setup_termux_env
     export NODE_OPTIONS=--openssl-legacy-provider
     MCSM_DIR=$(find_mcsm_dir)
     if [ -z "$MCSM_DIR" ]; then
@@ -135,6 +159,7 @@ start_Daemon() {
 # 启动web进程
 start_web() {
     echo "> 启动Web进程"
+    setup_termux_env
     export NODE_OPTIONS=--openssl-legacy-provider
     MCSM_DIR=$(find_mcsm_dir)
     if [ -z "$MCSM_DIR" ]; then
@@ -163,6 +188,16 @@ uninstall_MCSManager() {
     fi
 }
 
+# 设置 Termux 环境变量，确保守护进程子进程能继承
+setup_termux_env() {
+    if [ -z "$PREFIX" ]; then
+        export PREFIX="/data/data/com.termux/files/usr"
+    fi
+    export PATH="$PREFIX/bin:$PREFIX/bin/applets:$PATH"
+    export HOME="${HOME:-/data/data/com.termux/files/home}"
+    export LD_LIBRARY_PATH="$PREFIX/lib:$LD_LIBRARY_PATH"
+}
+
 # 一键后台启动守护进程+Web面板
 start_all_background() {
     MCSM_DIR=$(find_mcsm_dir)
@@ -171,6 +206,7 @@ start_all_background() {
         return
     fi
 
+    setup_termux_env
     export NODE_OPTIONS=--openssl-legacy-provider
     LOG_DIR="$MCSM_DIR/logs"
     mkdir -p "$LOG_DIR"
