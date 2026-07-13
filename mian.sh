@@ -6,13 +6,26 @@ GRAY='\033[90m'
 RESET='\033[0m'
 
 clear
-ip_address=$(ifconfig 2>/dev/null | grep 'inet ' | grep -Fv 127.0.0.1 | awk '{print $2}' | head -1)
+# 获取所有网卡IP
+get_all_ips() {
+    ifconfig 2>/dev/null | grep 'inet ' | grep -Fv 127.0.0.1 | awk '{print $2}' | paste -sd ' '
+}
+# 获取公网IP
+get_public_ip() {
+    curl -s --connect-timeout 3 ip.sb 2>/dev/null || \
+    curl -s --connect-timeout 3 ifconfig.me 2>/dev/null || \
+    curl -s --connect-timeout 3 icanhazip.com 2>/dev/null || \
+    echo "获取失败"
+}
+local_ips=$(get_all_ips)
+public_ip=$(get_public_ip)
 echo "
 By: 星见雅（HSOS6）
 
  欢迎使用 MCSManager-for-Android 小白辅助脚本
 "
-echo "本机IP地址： $ip_address"
+echo "本机IP：$local_ips"
+echo "公网IP：$public_ip"
 echo '
 bash <(curl -sSL https://raw.githubusercontent.com/HSOS6/MCSManager-for-Android/main/mian.sh)
 
@@ -70,7 +83,8 @@ check_mcsm_status() {
 
     echo "MCSM运行状态"
     echo -e "网页端 ${web_color}${web_status}${RESET}   守护端 ${daemon_color}${daemon_status}${RESET}"
-    echo "您的IP：$ip_address"
+    echo "本机IP：$local_ips"
+    echo "公网IP：$public_ip"
 }
 
 # 一键安装MCSManager-for-Android
