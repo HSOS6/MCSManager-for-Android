@@ -26,7 +26,6 @@ bash <(curl -sSL https://raw.githubusercontent.com/HSOS6/MCSManager-for-Android/
 ```
 
 ```shell
-By: wjsw3369
 
 欢迎使用 MCSManager-for-Android 小白辅助脚本
  
